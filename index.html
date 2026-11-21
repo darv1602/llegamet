@@ -266,7 +266,7 @@ $("demo").onclick=()=>enter("Estudiante Demo");$("dadm").onclick=()=>enter("Admi
 $("af").onsubmit=e=>{e.preventDefault();const em=$("em").value.trim().toLowerCase(),err=m=>{$("ae").textContent=m};
   if(mode==="up"&&$("nm").value.trim().length<3)return err("Escribe tu nombre completo.");
   if(!/^[^@\s]+@(correo\.)?unimet\.edu\.ve$/.test(em))return err("Usa tu correo institucional, que termina en @unimet.edu.ve o @correo.unimet.edu.ve.");
-  if(mode==="up"&&!/^\d{8,10}$/.test($("ca").value.trim()))return err("Escribe tu número de carnet, solo con números.");
+  if(mode==="up"&&!/^\d{4,15}$/.test($("ca").value.replace(/[\s#.\-]/g,"")))return err("Escribe tu número de carnet usando solo dígitos (mínimo 4).");
   if($("pw").value.length<6)return err("La contraseña debe tener al menos 6 caracteres.");
   enter(mode==="up"?$("nm").value.trim():em.split("@")[0].replace(/[._]+/g," ").replace(/\b\w/g,c=>c.toUpperCase()))};
 $("f").onsubmit=()=>{trips.push({n:user,c:"UNIMET",car:$("c").value,t:$("h").value,s:+$("p").value,z:$("o").value,d:+$("h").value.slice(0,2)<12?"hacia":"desde"});

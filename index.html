@@ -181,7 +181,20 @@ dialog select,dialog input{width:100%}
   <div class="est">Ganarás <strong>1,5 horas</strong> de Servicio Comunitario al validar este viaje.</div>
   <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px"><button type="button" class="btn ghost sm" id="cx">Cancelar</button><button class="btn sm" type="submit">Publicar cola</button></div>
 </form></dialog>
-<dialog id="ld"><h3>Iniciar sesión</h3><p>Entra con tu correo <strong>@correo.unimet.edu.ve</strong> y tu carnet. Esta es una demostración: no se guarda ningún dato.</p><div style="text-align:right"><button class="btn sm" onclick="this.closest('dialog').close()">Entendido</button></div></dialog>
+<dialog id="ld"><form id="af" novalidate>
+  <h3>Entra a LlegaMet</h3>
+  <p class="seats" style="margin:6px 0 14px">Acceso exclusivo con correo institucional UNIMET.</p>
+  <div class="seg" role="group" aria-label="Tipo de acceso"><button type="button" id="tin" aria-pressed="true" style="flex:1">Iniciar sesión</button><button type="button" id="tup" aria-pressed="false" style="flex:1">Registrarse</button></div>
+  <div id="nw" hidden><label for="nm">Nombre completo</label><input id="nm" type="text" autocomplete="name"></div>
+  <label for="em">Correo institucional</label><input id="em" type="text" inputmode="email" autocomplete="email" placeholder="estudiante@unimet.edu.ve">
+  <div id="cw" hidden><label for="ca">Número de carnet</label><input id="ca" type="text" inputmode="numeric" placeholder="Ej. 2021111094"></div>
+  <label for="pw">Contraseña</label><input id="pw" type="password" autocomplete="current-password">
+  <p id="ae" role="alert" style="color:#d33a1f;font-weight:600;font-size:.88rem;min-height:1.2em;margin:10px 0 0"></p>
+  <button class="btn" id="asub" type="submit" style="width:100%;margin-top:6px">Ingresar</button>
+  <button class="btn ghost sm" id="demo" type="button" style="width:100%;margin-top:10px">Acceso rápido: modo estudiante (demo)</button>
+  <p class="seats" style="margin:14px 0 0">Demostración: no se guarda ningún dato. En la versión real se verifica tu carnet.</p>
+  <div style="text-align:right;margin-top:6px"><button type="button" class="btn ghost sm" id="acx">Cerrar</button></div>
+</form></dialog>
 <div id="toast" role="status"></div>
 
 <script>
@@ -212,14 +225,26 @@ function render(){
    <button class="btn sm navy" data-i="${i}" ${x.s?"":"disabled"}>${x.s?"Pedir cola":"Sin puestos"}</button></div></article>`}).join(""):
    `<div class="empty">No hay colas con esos filtros. Cambia la zona o la hora, o publica la tuya.</div>`;
 }
-$("trips").onclick=e=>{const b=e.target.closest("button[data-i]");if(!b)return;const x=trips[b.dataset.i];if(x.s<1)return;x.s--;render();
+$("trips").onclick=e=>{const b=e.target.closest("button[data-i]");if(!b||needLogin())return;const x=trips[b.dataset.i];if(x.s<1)return;x.s--;render();
   toast(`Cola confirmada con ${x.n.split(" ")[0]}: ${x.t} en ${PT[x.z]}. Te quedan sus datos de contacto en tu carnet digital.`)};
 document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>{dir=b.dataset.dir;document.querySelectorAll("[data-dir]").forEach(k=>k.setAttribute("aria-pressed",k===b));render()});
 $("zona").onchange=$("desde").onchange=render;
-document.querySelectorAll("[data-publish]").forEach(b=>b.onclick=()=>$("dlg").showModal());
+document.querySelectorAll("[data-publish]").forEach(b=>b.onclick=()=>{if(!needLogin())$("dlg").showModal()});
 $("cx").onclick=()=>$("dlg").close();
-$("login").onclick=()=>$("ld").showModal();
-$("f").onsubmit=()=>{trips.push({n:"Tú (Conductor)",c:"UNIMET",car:$("c").value,t:$("h").value,s:+$("p").value,z:$("o").value,d:+$("h").value.slice(0,2)<12?"hacia":"desde"});
+let user=null,mode="in";
+function setMode(m){mode=m;$("tin").setAttribute("aria-pressed",m==="in");$("tup").setAttribute("aria-pressed",m==="up");$("nw").hidden=$("cw").hidden=m==="in";$("asub").textContent=m==="in"?"Ingresar":"Crear cuenta";$("ae").textContent=""}
+function needLogin(){if(user)return false;setMode("in");$("ld").showModal();return true}
+function enter(n){user=n;$("ld").close();$("af").reset();$("login").textContent="Hola, "+n.split(" ")[0]+" · Salir";toast("Sesión iniciada como "+n+".")}
+$("login").onclick=()=>{if(user){user=null;$("login").textContent="Iniciar sesión con @correo.unimet.edu.ve";toast("Cerraste sesión.")}else needLogin()};
+$("tin").onclick=()=>setMode("in");$("tup").onclick=()=>setMode("up");$("acx").onclick=()=>$("ld").close();
+$("demo").onclick=()=>enter("Estudiante Demo");
+$("af").onsubmit=e=>{e.preventDefault();const em=$("em").value.trim().toLowerCase(),err=m=>{$("ae").textContent=m};
+  if(mode==="up"&&$("nm").value.trim().length<3)return err("Escribe tu nombre completo.");
+  if(!/^[^@\s]+@(correo\.)?unimet\.edu\.ve$/.test(em))return err("Usa tu correo institucional, que termina en @unimet.edu.ve o @correo.unimet.edu.ve.");
+  if(mode==="up"&&!/^\d{8,10}$/.test($("ca").value.trim()))return err("Escribe tu número de carnet, solo con números.");
+  if($("pw").value.length<6)return err("La contraseña debe tener al menos 6 caracteres.");
+  enter(mode==="up"?$("nm").value.trim():em.split("@")[0].replace(/[._]+/g," ").replace(/\b\w/g,c=>c.toUpperCase()))};
+$("f").onsubmit=()=>{trips.push({n:user,c:"UNIMET",car:$("c").value,t:$("h").value,s:+$("p").value,z:$("o").value,d:+$("h").value.slice(0,2)<12?"hacia":"desde"});
   hours+=1.5;dir=trips[trips.length-1].d;document.querySelectorAll("[data-dir]").forEach(k=>k.setAttribute("aria-pressed",k.dataset.dir===dir));
   $("desde").value="00:00";$("zona").value="";render();upd();toast("Cola publicada. Sumarás 1,5 horas de Servicio Comunitario al validar el viaje.");$("trips").scrollIntoView({behavior:"smooth"})};
 const fmt=n=>String(n).replace(".",",");

@@ -93,6 +93,13 @@ dialog::backdrop{background:rgba(0,20,45,.6)}
 dialog label{display:block;font-weight:700;font-size:.9rem;margin:14px 0 6px}
 dialog select,dialog input{width:100%}
 .est{background:var(--soft);border-radius:10px;padding:12px;margin-top:16px;font-size:.92rem}
+[hidden]{display:none!important}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.vrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.vrow small{color:var(--mut)}
+.btn.red{background:#c9302c}
+.btn.grn{background:#1f8a4c}
+.lv{background:var(--soft);border-left:4px solid var(--or);border-radius:10px;padding:12px;margin:14px 0}
 #toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,120px);background:var(--navy);color:#fff;border-left:5px solid var(--or);padding:14px 18px;border-radius:12px;max-width:92vw;transition:transform .3s;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.3)}
 #toast.on{transform:translate(-50%,0)}
 </style>
@@ -102,7 +109,7 @@ dialog select,dialog input{width:100%}
   <a class="logo" href="#inicio" aria-label="LlegaMet, inicio">
     <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><rect width="36" height="36" rx="10" fill="#F26522"/><path d="M10 9v15c0 2 1 3 3 3h13" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="26" cy="12" r="3.2" fill="#002855"/><path d="M15 17c4-1 7-3 8-5" stroke="#002855" stroke-width="2" stroke-dasharray="2 3" stroke-linecap="round" fill="none"/></svg>
     <span>Llega<b>Met</b></span></a>
-  <nav aria-label="Principal"><a href="#inicio">Inicio</a><a href="#como">¿Cómo funciona?</a><a href="#servicio">Servicio Comunitario</a><a href="#buscar">Buscar Cola</a></nav>
+  <nav aria-label="Principal"><a href="#inicio">Inicio</a><a href="#como">¿Cómo funciona?</a><a href="#servicio">Servicio Comunitario</a><a href="#buscar">Buscar Cola</a><a href="#adm" id="navadm" hidden>Panel admin</a></nav>
   <button class="btn sm" id="login">Iniciar sesión con @correo.unimet.edu.ve</button>
 </div></header>
 
@@ -162,6 +169,19 @@ dialog select,dialog input{width:100%}
     <p style="margin:14px 0 0;color:var(--mut)">Simulación: parte de 36 h. Publica una cola arriba y mira cómo sube.</p>
   </div>
 </div></section>
+<section class="soft" id="adm" hidden><div class="wrap">
+  <h2>Panel de administración</h2><p class="lead">Vista del administrador del sistema. Los datos son simulados.</p>
+  <div class="stats">
+    <div class="panel"><small class="seats">Usuarios registrados</small><div class="big" style="font-size:2.4rem" id="sU"></div><small class="seats">+12 hoy</small></div>
+    <div class="panel"><small class="seats">Rutas activas</small><div class="big" style="font-size:2.4rem" id="sR"></div><small class="seats">Publicadas ahora</small></div>
+    <div class="panel"><small class="seats">Colas completadas hoy</small><div class="big" style="font-size:2.4rem">142</div><small class="seats">98 % positivas</small></div>
+    <div class="panel"><small class="seats">Satisfacción</small><div class="big" style="font-size:2.4rem">4,92</div><small class="seats">de 5</small></div>
+  </div>
+  <div class="two" style="margin-top:20px">
+    <div class="panel"><h3>Demanda por zonas de Caracas</h3><div id="dz"></div></div>
+    <div class="panel"><h3>Verificación de carnets <span class="pill" id="pn"></span></h3><div id="vq"></div></div>
+  </div>
+</div></section>
 </main>
 
 <footer><div class="wrap"><div class="cols">
@@ -192,9 +212,14 @@ dialog select,dialog input{width:100%}
   <p id="ae" role="alert" style="color:#d33a1f;font-weight:600;font-size:.88rem;min-height:1.2em;margin:10px 0 0"></p>
   <button class="btn" id="asub" type="submit" style="width:100%;margin-top:6px">Ingresar</button>
   <button class="btn ghost sm" id="demo" type="button" style="width:100%;margin-top:10px">Acceso rápido: modo estudiante (demo)</button>
+  <button class="btn ghost sm" id="dadm" type="button" style="width:100%;margin-top:8px">Acceso rápido: administrador (demo)</button>
   <p class="seats" style="margin:14px 0 0">Demostración: no se guarda ningún dato. En la versión real se verifica tu carnet.</p>
   <div style="text-align:right;margin-top:6px"><button type="button" class="btn ghost sm" id="acx">Cerrar</button></div>
 </form></dialog>
+<dialog id="ldlg"><h3 id="lh">Ubicación compartida</h3>
+  <div id="lbody" style="margin-top:10px"></div>
+  <div class="lv" id="lview"></div>
+  <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn red sm" id="lstop">Dejar de compartir</button><button class="btn ghost sm" id="lcx">Cerrar</button></div></dialog>
 <div id="toast" role="status"></div>
 
 <script>
@@ -222,22 +247,22 @@ function render(){
    <div class="who"><div class="av" aria-hidden="true">${ini(x.n)}</div><div><strong>${x.n}</strong><br><small>${x.c}</small></div></div>
    <div class="meta"><span>📍 ${PT[x.z]} · ${x.z}</span><span>🚗 ${x.car}</span></div>
    <div class="foot"><div><div class="time">${x.t}</div><div class="seats">${x.s} ${x.s===1?"puesto":"puestos"}</div></div>
-   <button class="btn sm navy" data-i="${i}" ${x.s?"":"disabled"}>${x.s?"Pedir cola":"Sin puestos"}</button></div></article>`}).join(""):
+   ${reqs.has(i)?`<button class="btn sm" data-loc="${i}">${shared[i]?"Ver ubicación":"📍 Compartir ubicación"}</button>`:`<button class="btn sm navy" data-i="${i}" ${x.s?"":"disabled"}>${x.s?"Pedir cola":"Sin puestos"}</button>`}</div></article>`}).join(""):
    `<div class="empty">No hay colas con esos filtros. Cambia la zona o la hora, o publica la tuya.</div>`;
 }
-$("trips").onclick=e=>{const b=e.target.closest("button[data-i]");if(!b||needLogin())return;const x=trips[b.dataset.i];if(x.s<1)return;x.s--;render();
-  toast(`Cola confirmada con ${x.n.split(" ")[0]}: ${x.t} en ${PT[x.z]}. Te quedan sus datos de contacto en tu carnet digital.`)};
+$("trips").onclick=e=>{const b=e.target.closest("button[data-i]");if(!b||needLogin())return;const x=trips[b.dataset.i];if(x.s<1)return;x.s--;reqs.add(+b.dataset.i);render();
+  toast(`Cola confirmada con ${x.n.split(" ")[0]}: ${x.t} en ${PT[x.z]}. Comparte tu ubicación para que te encuentre.`)};
 document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>{dir=b.dataset.dir;document.querySelectorAll("[data-dir]").forEach(k=>k.setAttribute("aria-pressed",k===b));render()});
 $("zona").onchange=$("desde").onchange=render;
 document.querySelectorAll("[data-publish]").forEach(b=>b.onclick=()=>{if(!needLogin())$("dlg").showModal()});
 $("cx").onclick=()=>$("dlg").close();
-let user=null,mode="in";
+let user=null,mode="in",isAdmin=false,reqs=new Set(),shared={};
 function setMode(m){mode=m;$("tin").setAttribute("aria-pressed",m==="in");$("tup").setAttribute("aria-pressed",m==="up");$("nw").hidden=$("cw").hidden=m==="in";$("asub").textContent=m==="in"?"Ingresar":"Crear cuenta";$("ae").textContent=""}
 function needLogin(){if(user)return false;setMode("in");$("ld").showModal();return true}
-function enter(n){user=n;$("ld").close();$("af").reset();$("login").textContent="Hola, "+n.split(" ")[0]+" · Salir";toast("Sesión iniciada como "+n+".")}
-$("login").onclick=()=>{if(user){user=null;$("login").textContent="Iniciar sesión con @correo.unimet.edu.ve";toast("Cerraste sesión.")}else needLogin()};
+function enter(n,adm){user=n;isAdmin=!!adm;$("adm").hidden=$("navadm").hidden=!isAdmin;if(isAdmin){renderAdm();setTimeout(()=>$("adm").scrollIntoView({behavior:"smooth"}),200)}$("ld").close();$("af").reset();$("login").textContent="Hola, "+n.split(" ")[0]+" · Salir";toast("Sesión iniciada como "+n+".")}
+$("login").onclick=()=>{if(user){user=null;isAdmin=false;$("adm").hidden=$("navadm").hidden=true;$("login").textContent="Iniciar sesión con @correo.unimet.edu.ve";toast("Cerraste sesión.")}else needLogin()};
 $("tin").onclick=()=>setMode("in");$("tup").onclick=()=>setMode("up");$("acx").onclick=()=>$("ld").close();
-$("demo").onclick=()=>enter("Estudiante Demo");
+$("demo").onclick=()=>enter("Estudiante Demo");$("dadm").onclick=()=>enter("Administrador UNIMET",true);
 $("af").onsubmit=e=>{e.preventDefault();const em=$("em").value.trim().toLowerCase(),err=m=>{$("ae").textContent=m};
   if(mode==="up"&&$("nm").value.trim().length<3)return err("Escribe tu nombre completo.");
   if(!/^[^@\s]+@(correo\.)?unimet\.edu\.ve$/.test(em))return err("Usa tu correo institucional, que termina en @unimet.edu.ve o @correo.unimet.edu.ve.");
@@ -252,6 +277,24 @@ function upd(){const w=+$("sl").value;$("slv").textContent=w;
   $("hrs").textContent=fmt(hours);$("fill").style.width=Math.min(100,hours/120*100)+"%";$("pb").setAttribute("aria-valuenow",hours);
   $("pct").textContent=Math.round(hours/120*100)+"% de la meta · faltan "+fmt(Math.max(0,120-hours))+" h";
   $("proj").textContent=`Con ${w} viajes por semana sumas ${fmt(w*1.5)} h. Llegarías a las 120 h en unas ${Math.ceil(Math.max(0,120-hours)/(w*1.5))} semanas.`}
+let users=1482,vq=[{n:"Diego Torres",c:"2023112091",k:"Ing. Sistemas"},{n:"Sofía Blanco",c:"2021110822",k:"Derecho"},{n:"Luis Hernández",c:"2022113345",k:"Economía"}];
+const ZD=[["Plaza Altamira",45],["Chacao / La Castellana",28],["Terrazas del Ávila / La California",18],["El Hatillo / La Trinidad",9]];
+function renderAdm(){$("sU").textContent=users.toLocaleString("es-VE");$("sR").textContent=trips.filter(t=>t.s>0).length;
+  $("dz").innerHTML=ZD.map(z=>`<div style="margin:10px 0"><div style="display:flex;justify-content:space-between"><span>${z[0]}</span><b>${z[1]} %</b></div><div class="bar" style="height:10px;margin:4px 0"><i style="width:${z[1]}%"></i></div></div>`).join("");
+  $("pn").textContent=vq.length+(vq.length===1?" pendiente":" pendientes");
+  $("vq").innerHTML=vq.length?vq.map((v,i)=>`<div class="vrow"><div><strong>${v.n}</strong><br><small>Carnet #${v.c} · ${v.k}</small></div><div style="display:flex;gap:6px"><button class="btn grn sm" data-v="ok" data-k="${i}">Aprobar</button><button class="btn red sm" data-v="no" data-k="${i}">Rechazar</button></div></div>`).join(""):`<p class="seats">No hay solicitudes pendientes.</p>`}
+$("vq").onclick=e=>{const b=e.target.closest("button[data-v]");if(!b)return;const v=vq.splice(+b.dataset.k,1)[0];if(b.dataset.v==="ok")users++;renderAdm();toast(b.dataset.v==="ok"?v.n+" fue verificado y ya puede usar LlegaMet.":"Solicitud de "+v.n+" rechazada.")};
+$("trips").addEventListener("click",e=>{const b=e.target.closest("button[data-loc]");if(b)openLoc(+b.dataset.loc)});
+function openLoc(i){const x=trips[i];if(shared[i])return showLoc(i);toast("Buscando tu ubicación…");
+  const no=()=>{shared[i]={label:PT[x.z],real:false};render();showLoc(i)};
+  if(!navigator.geolocation)return no();
+  navigator.geolocation.getCurrentPosition(p=>{shared[i]={lat:p.coords.latitude.toFixed(5),lng:p.coords.longitude.toFixed(5),real:true};render();showLoc(i)},no,{timeout:8000})}
+function showLoc(i){const x=trips[i],s=shared[i],f=x.n.split(" ")[0];$("lh").textContent="Ubicación compartida con "+f;
+  $("lbody").innerHTML=s.real?`<p>${f} ve tu ubicación hasta que termine el viaje.</p><a class="btn sm navy" target="_blank" rel="noopener" href="https://www.google.com/maps?q=${s.lat},${s.lng}">Ver en el mapa</a>`:`<p>No pudimos usar el GPS de tu dispositivo, así que compartimos tu punto de encuentro: <strong>${s.label}</strong>.</p>`;
+  $("lview").innerHTML=`<strong>Así lo ve ${f}</strong><br>${user} te espera en ${s.real?"estas coordenadas: "+s.lat+", "+s.lng:s.label}.`;
+  $("ldlg").dataset.i=i;$("ldlg").showModal()}
+$("lstop").onclick=()=>{delete shared[$("ldlg").dataset.i];$("ldlg").close();render();toast("Dejaste de compartir tu ubicación.")};
+$("lcx").onclick=()=>$("ldlg").close();
 $("sl").oninput=upd;render();upd();
 </script>
 </body>

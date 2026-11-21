@@ -99,6 +99,7 @@ dialog select,dialog input{width:100%}
 .vrow small{color:var(--mut)}
 .btn.red{background:#c9302c}
 .btn.grn{background:#1f8a4c}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
 .lv{background:var(--soft);border-left:4px solid var(--or);border-radius:10px;padding:12px;margin:14px 0}
 #toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,120px);background:var(--navy);color:#fff;border-left:5px solid var(--or);padding:14px 18px;border-radius:12px;max-width:92vw;transition:transform .3s;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.3)}
 #toast.on{transform:translate(-50%,0)}
@@ -194,10 +195,12 @@ dialog select,dialog input{width:100%}
 
 <dialog id="dlg"><form method="dialog" id="f">
   <h3>Publicar una cola</h3>
-  <label for="o">Punto de encuentro</label><select id="o"></select>
+  <label for="o">Zona donde puedes buscar pasajeros</label><select id="o"></select>
   <label for="h">Hora de salida</label><input id="h" type="time" value="07:30" required>
   <label for="p">Puestos libres</label><select id="p"><option>1</option><option>2</option><option selected>3</option><option>4</option></select>
   <label for="c">Tu carro</label><input id="c" type="text" placeholder="Ej. Kia Rio rojo" required>
+  <label for="tel">Tu teléfono (WhatsApp)</label><input id="tel" type="text" inputmode="tel" placeholder="0414 1234567" autocomplete="tel">
+  <p class="seats" style="margin:6px 0 0">Los pasajeros lo ven solo cuando confirmas su cola.</p>
   <div class="est">Ganarás <strong>1,5 horas</strong> de Servicio Comunitario al validar este viaje.</div>
   <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px"><button type="button" class="btn ghost sm" id="cx">Cancelar</button><button class="btn sm" type="submit">Publicar cola</button></div>
 </form></dialog>
@@ -216,6 +219,34 @@ dialog select,dialog input{width:100%}
   <p class="seats" style="margin:14px 0 0">Demostración: no se guarda ningún dato. En la versión real se verifica tu carnet.</p>
   <div style="text-align:right;margin-top:6px"><button type="button" class="btn ghost sm" id="acx">Cerrar</button></div>
 </form></dialog>
+<dialog id="rdlg"><form id="rf" novalidate>
+  <h3 id="rh">Pedir cola</h3>
+  <label for="rz">¿Desde qué zona necesitas la cola?</label><select id="rz"></select>
+  <div class="lv" id="rn" aria-live="polite"></div>
+  <label for="rp">Tu teléfono (WhatsApp)</label><input id="rp" type="text" inputmode="tel" placeholder="0414 1234567" autocomplete="tel">
+  <p class="seats" style="margin:8px 0 0">Solo se comparte con el conductor cuando tu cola queda confirmada.</p>
+  <p id="re" role="alert" style="color:#d33a1f;font-weight:600;font-size:.88rem;min-height:1.2em;margin:8px 0 0"></p>
+  <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px"><button type="button" class="btn ghost sm" id="rcx">Cancelar</button><button class="btn sm" id="rsub" type="submit">Pedir cola</button></div>
+</form></dialog>
+<dialog id="cdlg"><h3 id="cxt">¿Cancelar tu cola?</h3>
+  <label for="cxm">Motivo</label><select id="cxm"><option>Cambió mi horario</option><option>Ya conseguí otro transporte</option><option>Otro motivo</option></select>
+  <p class="seats">Se avisa a la otra persona y el puesto queda libre.</p>
+  <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px"><button class="btn ghost sm" id="ckeep">Mantener cola</button><button class="btn red sm" id="cok">Cancelar cola</button></div></dialog>
+<dialog id="rtdlg"><form id="rtf" novalidate>
+  <h3 id="rth">Calificar</h3><p class="seats" id="rtp" style="margin:4px 0 0"></p>
+  <div id="stars" role="group" aria-label="Calificación de 1 a 5 estrellas" style="display:flex;gap:6px;margin:12px 0"></div>
+  <label for="rtc">Comentario (opcional)</label><input id="rtc" type="text" maxlength="140" placeholder="Ej. Puntual y muy amable">
+  <p id="rte" role="alert" style="color:#d33a1f;font-weight:600;font-size:.88rem;min-height:1.2em;margin:8px 0 0"></p>
+  <div style="display:flex;gap:10px;justify-content:flex-end"><button type="button" class="btn ghost sm" id="rtx">Cerrar</button><button class="btn sm" type="submit">Enviar calificación</button></div>
+</form></dialog>
+<dialog id="hdlg"><form id="hf2" novalidate>
+  <h3>Comparte la ubicación de tu casa</h3>
+  <p class="seats" style="margin:6px 0 0">Solo <strong id="hf"></strong> la verá, para buscarte ahí mientras dure este viaje. Puedes dejar de compartirla cuando quieras.</p>
+  <label for="ha">Dirección de tu casa</label><input id="ha" type="text" autocomplete="street-address" placeholder="Ej. Edif. Las Torres, piso 4, Av. Principal de Los Palos Grandes">
+  <button class="btn ghost sm" id="hgps" type="button" style="width:100%;margin-top:10px">📍 Usar mi ubicación actual (estoy en casa)</button>
+  <p id="hmsg" role="status" style="color:var(--mut);font-size:.88rem;min-height:1.2em;margin:10px 0 0"></p>
+  <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px"><button type="button" class="btn ghost sm" id="hcx">Cancelar</button><button class="btn sm" type="submit">Compartir con el conductor</button></div>
+</form></dialog>
 <dialog id="ldlg"><h3 id="lh">Ubicación compartida</h3>
   <div id="lbody" style="margin-top:10px"></div>
   <div class="lv" id="lview"></div>
@@ -223,7 +254,7 @@ dialog select,dialog input{width:100%}
 <div id="toast" role="status"></div>
 
 <script>
-const ZONAS=["Altamira","Chacao","El Hatillo","La Trinidad","Santa Fe","Los Palos Grandes"];
+const ZONAS=["Altamira","Los Palos Grandes","Chacao","La Castellana","Los Dos Caminos","Sebucán","La California","Los Ruices","Boleíta","Terrazas del Ávila","Petare","El Rosal","Chacaíto","Sabana Grande","Las Mercedes","Bello Monte","Colinas de Bello Monte","Prados del Este","Santa Fe","El Cafetal","La Boyera","Baruta","El Hatillo","La Trinidad","San Antonio de los Altos","Los Teques","Guarenas","Guatire"];
 const PT={"Altamira":"Plaza Altamira (Metro)","Chacao":"Plaza Chacao","El Hatillo":"Plaza Bolívar de El Hatillo","La Trinidad":"C.C. Concresa","Santa Fe":"C.C. Santa Fe","Los Palos Grandes":"Av. Francisco de Miranda con 3.ª Transversal"};
 let trips=[
  {n:"Carlos Eduardo Silva",c:"Ing. Civil",car:"Toyota Yaris blanco",t:"08:10",s:2,z:"Altamira",d:"hacia"},
@@ -234,24 +265,30 @@ let trips=[
  {n:"Sofía Blanco",c:"Derecho",car:"Renault Logan plata",t:"07:00",s:3,z:"Los Palos Grandes",d:"hacia"},
  {n:"Gabriel Torres",c:"Ing. Química",car:"Hyundai Accent blanco",t:"16:30",s:2,z:"Altamira",d:"desde"},
  {n:"Camila Mendoza",c:"Ing. Sistemas",car:"Toyota Corolla gris",t:"17:15",s:3,z:"Chacao",d:"desde"},
- {n:"Luis Hernández",c:"Economía",car:"Chevrolet Aveo negro",t:"18:00",s:1,z:"El Hatillo",d:"desde"}
+ {n:"Luis Hernández",c:"Economía",car:"Chevrolet Aveo negro",t:"18:00",s:1,z:"El Hatillo",d:"desde"},
+ {n:"Paola Díaz",c:"Arquitectura",car:"Mazda 3 azul",t:"07:20",s:2,z:"Baruta",d:"hacia"},
+ {n:"Ricardo Salas",c:"Ing. Mecánica",car:"Chevrolet Optra gris",t:"06:30",s:3,z:"Los Teques",d:"hacia"},
+ {n:"Daniela Ferrer",c:"Comunicación",car:"Kia Picanto blanco",t:"07:50",s:2,z:"Las Mercedes",d:"hacia"},
+ {n:"Samuel Ortega",c:"Ing. Eléctrica",car:"Toyota Corolla azul",t:"07:05",s:2,z:"Guarenas",d:"hacia"},
+ {n:"Isabella Marcano",c:"Idiomas Modernos",car:"Hyundai i10 rojo",t:"16:45",s:3,z:"Sabana Grande",d:"desde"},
+ {n:"Andrés Pinto",c:"Ing. Industrial",car:"Ford Ecosport negro",t:"17:30",s:2,z:"Petare",d:"desde"}
 ];
 let dir="hacia",hours=36;const $=id=>document.getElementById(id);
 const toast=m=>{const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.k);toast.k=setTimeout(()=>t.classList.remove("on"),3500)};
-ZONAS.forEach(z=>{$("zona").add(new Option(z,z));$("o").add(new Option(PT[z],z))});
+ZONAS.forEach(z=>{$("zona").add(new Option(z,z));$("o").add(new Option(z,z))});
 const ini=n=>n.split(" ").map(w=>w[0]).slice(0,2).join("");
 function render(){
   const z=$("zona").value,from=$("desde").value||"00:00";
-  const list=trips.filter(x=>x.d===dir&&(!z||x.z===z)&&x.t>=from).sort((a,b)=>a.t.localeCompare(b.t));
+  const list=trips.filter(x=>!x.off&&x.d===dir&&(!z||x.z===z)&&x.t>=from).sort((a,b)=>a.t.localeCompare(b.t));
   $("trips").innerHTML=list.length?list.map(x=>{const i=trips.indexOf(x);return `<article class="trip">
    <div class="who"><div class="av" aria-hidden="true">${ini(x.n)}</div><div><strong>${x.n}</strong><br><small>${x.c}</small></div></div>
-   <div class="meta"><span>📍 ${PT[x.z]} · ${x.z}</span><span>🚗 ${x.car}</span></div>
+   <div class="meta"><span>📍 ${x.d==="hacia"?"Busca pasajeros en "+x.z+" y de camino a la UNIMET":"Sale de la UNIMET y busca pasajeros de camino a "+x.z}</span><span>🚗 ${x.car}</span></div>
    <div class="foot"><div><div class="time">${x.t}</div><div class="seats">${x.s} ${x.s===1?"puesto":"puestos"}</div></div>
-   ${reqs.has(i)?`<button class="btn sm" data-loc="${i}">${shared[i]?"Ver ubicación":"📍 Compartir ubicación"}</button>`:`<button class="btn sm navy" data-i="${i}" ${x.s?"":"disabled"}>${x.s?"Pedir cola":"Sin puestos"}</button>`}</div></article>`}).join(""):
+   ${x.mine?`<span class="pill">Tu cola</span></div><div class="acts"><button class="btn sm ghost" data-rate="${i}">${rated[i]?"Calificado":"Calificar pasajero"}</button><button class="btn sm red" data-cx="${i}">Cancelar mi cola</button></div></article>`:reqs.has(i)?`<span class="pill">Cola pedida</span></div><div class="acts"><button class="btn sm grn" data-wa="${i}">WhatsApp</button><button class="btn sm ghost" data-rate="${i}">${rated[i]?"Calificado":"Calificar"}</button><button class="btn sm red" data-cx="${i}">Cancelar cola</button><button class="btn sm" data-loc="${i}">${shared[i]?"Ver ubicación":"📍 Compartir ubicación"}</button></div></article>`:`<button class="btn sm navy" data-i="${i}" ${x.s?"":"disabled"}>${x.s?"Pedir cola":"Sin puestos"}</button></div></article>`}`}).join(""):
    `<div class="empty">No hay colas con esos filtros. Cambia la zona o la hora, o publica la tuya.</div>`;
 }
-$("trips").onclick=e=>{const b=e.target.closest("button[data-i]");if(!b||needLogin())return;const x=trips[b.dataset.i];if(x.s<1)return;x.s--;reqs.add(+b.dataset.i);render();
-  toast(`Cola confirmada con ${x.n.split(" ")[0]}: ${x.t} en ${PT[x.z]}. Comparte tu ubicación para que te encuentre.`)};
+$("trips").onclick=e=>{const b=e.target.closest("button[data-i]");if(!b||needLogin())return;const x=trips[b.dataset.i];if(x.s<1)return;openReq(+b.dataset.i);
+  };
 document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>{dir=b.dataset.dir;document.querySelectorAll("[data-dir]").forEach(k=>k.setAttribute("aria-pressed",k===b));render()});
 $("zona").onchange=$("desde").onchange=render;
 document.querySelectorAll("[data-publish]").forEach(b=>b.onclick=()=>{if(!needLogin())$("dlg").showModal()});
@@ -269,7 +306,7 @@ $("af").onsubmit=e=>{e.preventDefault();const em=$("em").value.trim().toLowerCas
   if(mode==="up"&&!/^\d{4,15}$/.test($("ca").value.replace(/[\s#.\-]/g,"")))return err("Escribe tu número de carnet usando solo dígitos (mínimo 4).");
   if($("pw").value.length<6)return err("La contraseña debe tener al menos 6 caracteres.");
   enter(mode==="up"?$("nm").value.trim():em.split("@")[0].replace(/[._]+/g," ").replace(/\b\w/g,c=>c.toUpperCase()))};
-$("f").onsubmit=()=>{trips.push({n:user,c:"UNIMET",car:$("c").value,t:$("h").value,s:+$("p").value,z:$("o").value,d:+$("h").value.slice(0,2)<12?"hacia":"desde"});
+$("f").onsubmit=()=>{trips.push({n:user,mine:true,p:$("tel").value,c:"UNIMET",car:$("c").value,t:$("h").value,s:+$("p").value,z:$("o").value,d:+$("h").value.slice(0,2)<12?"hacia":"desde"});
   hours+=1.5;dir=trips[trips.length-1].d;document.querySelectorAll("[data-dir]").forEach(k=>k.setAttribute("aria-pressed",k.dataset.dir===dir));
   $("desde").value="00:00";$("zona").value="";render();upd();toast("Cola publicada. Sumarás 1,5 horas de Servicio Comunitario al validar el viaje.");$("trips").scrollIntoView({behavior:"smooth"})};
 const fmt=n=>String(n).replace(".",",");
@@ -279,22 +316,62 @@ function upd(){const w=+$("sl").value;$("slv").textContent=w;
   $("proj").textContent=`Con ${w} viajes por semana sumas ${fmt(w*1.5)} h. Llegarías a las 120 h en unas ${Math.ceil(Math.max(0,120-hours)/(w*1.5))} semanas.`}
 let users=1482,vq=[{n:"Diego Torres",c:"2023112091",k:"Ing. Sistemas"},{n:"Sofía Blanco",c:"2021110822",k:"Derecho"},{n:"Luis Hernández",c:"2022113345",k:"Economía"}];
 const ZD=[["Plaza Altamira",45],["Chacao / La Castellana",28],["Terrazas del Ávila / La California",18],["El Hatillo / La Trinidad",9]];
-function renderAdm(){$("sU").textContent=users.toLocaleString("es-VE");$("sR").textContent=trips.filter(t=>t.s>0).length;
+function renderAdm(){$("sU").textContent=users.toLocaleString("es-VE");$("sR").textContent=trips.filter(t=>t.s>0&&!t.off).length;
   $("dz").innerHTML=ZD.map(z=>`<div style="margin:10px 0"><div style="display:flex;justify-content:space-between"><span>${z[0]}</span><b>${z[1]} %</b></div><div class="bar" style="height:10px;margin:4px 0"><i style="width:${z[1]}%"></i></div></div>`).join("");
   $("pn").textContent=vq.length+(vq.length===1?" pendiente":" pendientes");
   $("vq").innerHTML=vq.length?vq.map((v,i)=>`<div class="vrow"><div><strong>${v.n}</strong><br><small>Carnet #${v.c} · ${v.k}</small></div><div style="display:flex;gap:6px"><button class="btn grn sm" data-v="ok" data-k="${i}">Aprobar</button><button class="btn red sm" data-v="no" data-k="${i}">Rechazar</button></div></div>`).join(""):`<p class="seats">No hay solicitudes pendientes.</p>`}
 $("vq").onclick=e=>{const b=e.target.closest("button[data-v]");if(!b)return;const v=vq.splice(+b.dataset.k,1)[0];if(b.dataset.v==="ok")users++;renderAdm();toast(b.dataset.v==="ok"?v.n+" fue verificado y ya puede usar LlegaMet.":"Solicitud de "+v.n+" rechazada.")};
-$("trips").addEventListener("click",e=>{const b=e.target.closest("button[data-loc]");if(b)openLoc(+b.dataset.loc)});
+$("trips").addEventListener("click",e=>{const b=e.target.closest("button[data-loc]");if(b)askHome(+b.dataset.loc)});
 function openLoc(i){const x=trips[i];if(shared[i])return showLoc(i);toast("Buscando tu ubicación…");
   const no=()=>{shared[i]={label:PT[x.z],real:false};render();showLoc(i)};
   if(!navigator.geolocation)return no();
   navigator.geolocation.getCurrentPosition(p=>{shared[i]={lat:p.coords.latitude.toFixed(5),lng:p.coords.longitude.toFixed(5),real:true};render();showLoc(i)},no,{timeout:8000})}
 function showLoc(i){const x=trips[i],s=shared[i],f=x.n.split(" ")[0];$("lh").textContent="Ubicación compartida con "+f;
-  $("lbody").innerHTML=s.real?`<p>${f} ve tu ubicación hasta que termine el viaje.</p><a class="btn sm navy" target="_blank" rel="noopener" href="https://www.google.com/maps?q=${s.lat},${s.lng}">Ver en el mapa</a>`:`<p>No pudimos usar el GPS de tu dispositivo, así que compartimos tu punto de encuentro: <strong>${s.label}</strong>.</p>`;
-  $("lview").innerHTML=`<strong>Así lo ve ${f}</strong><br>${user} te espera en ${s.real?"estas coordenadas: "+s.lat+", "+s.lng:s.label}.`;
+  $("lbody").innerHTML=`<p>${f} puede ver la dirección de tu casa hasta que termine el viaje: <strong>${esc(s.addr)}</strong></p><a class="btn sm navy" target="_blank" rel="noopener" href="${mapUrl(s)}">Ver en el mapa</a>`;
+  $("lview").innerHTML=`<strong>Así lo ve ${f}</strong><br>Busca a ${esc(user)} en: ${esc(s.addr)}.<br><a class="btn grn sm" style="margin-top:8px" target="_blank" rel="noopener" href="${wa(phones[i],"Hola, soy "+f+" de LlegaMet. Ya voy en camino a buscarte.")}">WhatsApp de ${esc(user)}</a>`;
   $("ldlg").dataset.i=i;$("ldlg").showModal()}
 $("lstop").onclick=()=>{delete shared[$("ldlg").dataset.i];$("ldlg").close();render();toast("Dejaste de compartir tu ubicación.")};
 $("lcx").onclick=()=>$("ldlg").close();
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const mapUrl=s=>s.lat?`https://www.google.com/maps?q=${s.lat},${s.lng}`:`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.addr+", Caracas")}`;
+function askHome(i){if(shared[i])return showLoc(i);$("hf").textContent=trips[i].n.split(" ")[0];$("hdlg").dataset.i=i;$("ha").value="";$("hgps").dataset.c="";$("hmsg").textContent="";$("hdlg").showModal()}
+$("hgps").onclick=()=>{const m=$("hmsg");if(!navigator.geolocation){m.textContent="Tu dispositivo no permite usar el GPS. Escribe la dirección.";return}m.textContent="Buscando tu ubicación…";
+  navigator.geolocation.getCurrentPosition(p=>{$("hgps").dataset.c=p.coords.latitude.toFixed(5)+","+p.coords.longitude.toFixed(5);m.textContent="Ubicación guardada. Agrega también la dirección o una referencia."},()=>{m.textContent="No pudimos obtener tu ubicación. Escribe la dirección."},{timeout:8000})};
+$("hf2").onsubmit=e=>{e.preventDefault();const i=$("hdlg").dataset.i,a=$("ha").value.trim(),c=$("hgps").dataset.c;
+  if(a.length<6){$("hmsg").textContent="Escribe la dirección de tu casa con una referencia: edificio, calle o urbanización.";return}
+  shared[i]={addr:a,lat:c?c.split(",")[0]:"",lng:c?c.split(",")[1]:""};$("hdlg").close();render();showLoc(i)};
+$("hcx").onclick=()=>$("hdlg").close();
+const ROUTE={};["Altamira|Los Palos Grandes","Altamira|Chacao","Altamira|La Castellana","La Castellana|Chacao","La Castellana|Los Dos Caminos","Los Palos Grandes|Los Dos Caminos","Los Palos Grandes|Chacao","Chacao|El Rosal","Chacao|Chacaíto","El Rosal|Sabana Grande","Sabana Grande|Chacaíto","Sabana Grande|Bello Monte","Chacaíto|Las Mercedes","Las Mercedes|Bello Monte","Las Mercedes|Baruta","Las Mercedes|Prados del Este","Bello Monte|Colinas de Bello Monte","Colinas de Bello Monte|Prados del Este","Prados del Este|Santa Fe","Prados del Este|La Trinidad","Santa Fe|La Trinidad","Santa Fe|El Cafetal","El Cafetal|Baruta","Baruta|La Boyera","Baruta|El Hatillo","Baruta|La Trinidad","La Boyera|El Hatillo","El Hatillo|La Trinidad","El Cafetal|San Antonio de los Altos","San Antonio de los Altos|Los Teques","Los Dos Caminos|Sebucán","Los Dos Caminos|Los Ruices","Sebucán|La California","Sebucán|Terrazas del Ávila","La California|Boleíta","La California|Los Ruices","Los Ruices|Terrazas del Ávila","Boleíta|Terrazas del Ávila","Boleíta|Petare","Los Ruices|Petare","Petare|Guarenas","Guarenas|Guatire"].forEach(s=>{const[a,b]=s.split("|");(ROUTE[a]=ROUTE[a]||[a]).push(b);(ROUTE[b]=ROUTE[b]||[b]).push(a)});ZONAS.forEach(z=>{ROUTE[z]=ROUTE[z]||[z];if(!ROUTE[z].includes("Terrazas del Ávila"))ROUTE[z].push("Terrazas del Ávila")});
+let rated={},phones={},pz={},myPhone="",cxI=null,rv=0;
+const digits=s=>String(s).replace(/\D/g,"");
+const wa=(p,t)=>"https://wa.me/"+digits(p||"").replace(/^0/,"58")+"?text="+encodeURIComponent(t);
+$("rz").add(new Option("Elige tu zona",""));ZONAS.forEach(z=>$("rz").add(new Option(z,z)));$("rz").add(new Option("Otra zona","Otra zona"));
+function openReq(i){const x=trips[i];$("rdlg").dataset.i=i;$("rh").textContent="Pedir cola a "+x.n.split(" ")[0];$("rz").value=$("zona").value||"";$("rp").value=myPhone;$("re").textContent="";checkRoute();$("rdlg").showModal()}
+function checkRoute(){const x=trips[+$("rdlg").dataset.i],z=$("rz").value,m=$("rn"),b=$("rsub"),r=ROUTE[x.z],f=esc(x.n.split(" ")[0]);$("re").textContent="";
+  if(!z){m.textContent="Elige tu zona para saber si estás en su ruta.";b.textContent="Pedir cola";return}
+  if(r.includes(z)){m.innerHTML=`✅ <strong>Estás en la ruta de ${f}.</strong> Pasa por ${r.join(", ")}.`;b.textContent="Pedir cola"}
+  else{m.innerHTML=`⚠️ <strong>No estás en la ruta de ${f}.</strong> Pasa por ${r.join(", ")}. Puedes pedirla igual: decidirá si puede desviarse.`;b.textContent="Pedir de todos modos"}}
+$("rz").onchange=checkRoute;$("rcx").onclick=()=>$("rdlg").close();
+$("rf").onsubmit=e=>{e.preventDefault();const i=+$("rdlg").dataset.i,x=trips[i],z=$("rz").value,p=$("rp").value,f=x.n.split(" ")[0];
+  if(!z){$("re").textContent="Elige tu zona.";return}
+  if(digits(p).length<10){$("re").textContent="Escribe tu teléfono con WhatsApp, por ejemplo 0414 1234567.";return}
+  if(x.s<1)return;x.s--;reqs.add(i);phones[i]=p;myPhone=p;pz[i]=z;$("rdlg").close();render();
+  toast(ROUTE[x.z].includes(z)?`Cola confirmada con ${f}: estás en su ruta (${z}). Escríbele por WhatsApp o comparte la ubicación de tu casa.`:`Cola pedida a ${f}, pero estás fuera de su ruta. Decidirá si puede desviarse; escríbele por WhatsApp.`)};
+$("trips").addEventListener("click",e=>{const w=e.target.closest("button[data-wa]"),r=e.target.closest("button[data-rate]"),c=e.target.closest("button[data-cx]");
+  if(w){const i=+w.dataset.wa,x=trips[i],f=x.n.split(" ")[0];window.open(wa(x.p,`Hola ${f}, soy ${user} y pedí tu cola de las ${x.t} en LlegaMet (${pz[i]}). ¿Me confirmas?`),"_blank","noopener");if(!x.p)toast(`En WhatsApp, elige el contacto de ${f}. En la versión real se abre su chat directo.`)}
+  if(r)openRate(+r.dataset.rate);
+  if(c){cxI=+c.dataset.cx;const x=trips[cxI];$("cxt").textContent=x.mine?"¿Cancelar tu cola de las "+x.t+"?":"¿Cancelar tu cola con "+x.n.split(" ")[0]+"?";$("cdlg").showModal()}});
+$("ckeep").onclick=()=>$("cdlg").close();
+$("cok").onclick=()=>{const i=cxI,x=trips[i],f=x.n.split(" ")[0];
+  if(x.mine){x.off=true;toast("Cancelaste tu cola. Avisamos a tus pasajeros.")}
+  else{x.s++;reqs.delete(i);delete shared[i];delete phones[i];delete pz[i];toast(`Cancelaste tu cola con ${f}. Le avisamos y su puesto quedó libre.`)}
+  $("cdlg").close();render();renderAdm()};
+function paintStars(){$("stars").innerHTML=[1,2,3,4,5].map(n=>`<button type="button" data-s="${n}" aria-label="${n} ${n===1?"estrella":"estrellas"}" aria-pressed="${n<=rv}" style="border:0;background:none;font-size:2rem;line-height:1;cursor:pointer;color:${n<=rv?"#F2A900":"var(--line)"}">★</button>`).join("")}
+$("stars").onclick=e=>{const b=e.target.closest("button[data-s]");if(b){rv=+b.dataset.s;paintStars();$("rte").textContent=""}};
+function openRate(i){const x=trips[i],drv=!x.mine;rv=0;paintStars();$("rtdlg").dataset.i=i;$("rth").textContent=drv?"Califica a tu conductor":"Califica a tu pasajero";$("rtp").textContent=drv?x.n+" · "+x.car:"Camila Mendoza · Ing. Sistemas";$("rtc").value="";$("rte").textContent="";$("rtdlg").showModal()}
+$("rtf").onsubmit=e=>{e.preventDefault();if(!rv){$("rte").textContent="Elige de 1 a 5 estrellas.";return}const i=+$("rtdlg").dataset.i,x=trips[i];rated[i]=rv;$("rtdlg").close();render();
+  toast(`Calificaste a ${x.mine?"tu pasajero":x.n.split(" ")[0]} con ${rv} ${rv===1?"estrella":"estrellas"}. Gracias por cuidar a la comunidad.`)};
+$("rtx").onclick=()=>$("rtdlg").close();
 $("sl").oninput=upd;render();upd();
 </script>
 </body>
